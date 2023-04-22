@@ -24,6 +24,13 @@ def main():
     # Read in CSV.
     artists_csv = load_csv(args.input)
     header = artists_csv[0]
+    assert header == ['City',
+                      'Artist',
+                      'Song',
+                      'Link',
+                      'Views',
+                      'Difference',
+                      'Last Updated'], "Headers are wrong!"
     artists_data = artists_csv[1:]
 
     # Query API and generate final result.
@@ -80,7 +87,6 @@ def load_csv(file_path):
 
 # Writes the data to a CSV at the given path.
 def write_csv(file_path, data): 
-    print(data)
     with open(file_path, 'w') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(data)
@@ -108,4 +114,4 @@ def authenticate():
 
 if __name__ == '__main__':
     main()
-    print('SUCCESS!'
+    print('SUCCESS!')
