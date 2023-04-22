@@ -1,0 +1,17 @@
+#!/bin/bash
+
+command -v python3 >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo ERROR: python3 installation not found
+    exit 1
+fi
+
+command -v python3 -m pip >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo ERROR: pip installation not found
+    exit 1
+fi
+
+python3 -m pip install --upgrade google-api-python-client >/dev/null 2>&1
+python3 -m pip install --upgrade google-auth-oauthlib google-auth-httplib2 >/dev/null 2>&1
+python3 main.py --input artists.csv --output new_artists.csv
