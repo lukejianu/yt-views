@@ -24,7 +24,7 @@ def main():
     # Read in CSV.
     artists_csv = load_csv(args.input)
     header = artists_csv[0]
-    assert header == ['City',
+    assert header == ['Region',
                       'Artist',
                       'Song',
                       'Link',
@@ -42,16 +42,16 @@ def main():
     write_csv(args.output, new_artist_csv)
 
 # Transforms the supplied row into a row with updated view date.
-def perform_row_update(city, artist, song, link, views, difference, last_update, views_map): 
+def perform_row_update(region, artist, song, link, views, difference, last_update, views_map): 
     new_views = views_map.get(url_to_id(link))
     now = date.today().strftime("%m/%d/%y")
     if views: 
         new_difference = new_views - int(views.replace(',', ''))
-        return [city, artist, song, link, 
+        return [region, artist, song, link, 
                 format(new_views, ','),
                 format(new_difference, ','), now]
     else:
-        return [city, artist, song, link, format(new_views, ','), 0, now]
+        return [region, artist, song, link, format(new_views, ','), 0, now]
 
 # Creates the map from YouTube video IDs to their view counts.
 def make_view_map(data, client, ids):
