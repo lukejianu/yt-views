@@ -3,6 +3,7 @@ import csv
 from datetime import date
 import os.path
 import re
+from functools import reduce
 
 from googleapiclient.discovery import build
 import googleapiclient.discovery
@@ -35,7 +36,7 @@ def main():
 
     # Query API and generate final result.
     client = create_client()
-    views_map = make_view_map(artists_data, client, extract_ids(artists_data))
+    views_map = make_view_map(client, partition_ids(extract_ids(artists_data)))
     new_artist_csv = [header] + [perform_row_update(*row, views_map) for row in artists_data]
 
     # Write out to CSV.
@@ -54,7 +55,13 @@ def perform_row_update(region, artist, song, link, views, difference, last_updat
         return [region, artist, song, link, format(new_views, ','), 0, now]
 
 # Creates the map from YouTube video IDs to their view counts.
-def make_view_map(data, client, ids):
+def make_view_map(client, ids):
+    return reduce(lambda d1, d2: d1 | d2,
+                    [request_statistics(client, ids_batch) for ids_batch in ids],
+                    dict())
+
+# Request view statistics from videos with the associated given IDs.
+def request_statistics(client, ids):
     request = client.videos().list(
             part="statistics",
             id=ids
@@ -62,9 +69,16 @@ def make_view_map(data, client, ids):
     stats = request.execute()
     return dict([(stat['id'], int(stat["statistics"]["viewCount"])) for stat in stats["items"]])
 
+# Partitions the IDs into a list of lists with less than 50 IDs.
+def partition_ids(ids):
+    partition_size = 50
+    partitions = len(ids) // partition_size + 1
+    return [ids[i * partition_size:i * partition_size + partition_size] for i in range(partitions)]
+
 # Extracts a list of YouTube IDs from rows of video data (includes a URL).
 def extract_ids(data):
     urls = [row[3] for row in data]
+    print([url_to_id(url) for url in urls])
     return [url_to_id(url) for url in urls]
 
 # Returns a YouTube ID from a YouTube URL.
