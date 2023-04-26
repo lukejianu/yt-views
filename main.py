@@ -78,7 +78,6 @@ def partition_ids(ids):
 # Extracts a list of YouTube IDs from rows of video data (includes a URL).
 def extract_ids(data):
     urls = [row[3] for row in data]
-    print([url_to_id(url) for url in urls])
     return [url_to_id(url) for url in urls]
 
 # Returns a YouTube ID from a YouTube URL.
